@@ -1,0 +1,64 @@
+/* 
+* This expermental software is provided AS IS. 
+* Feel free to use/modify/distribute, 
+* If used, please retain this disclaimer and cite 
+* "GPUfs: Integrating a file system with GPUs", 
+* M Silberstein,B Ford,I Keidar,E Witchel
+* ASPLOS13, March 2013, Houston,USA
+*/
+
+
+This is a GPUfs source code.
+
+The code is quite far from being production quality, so it is provided as is, and presumably only for educational purposes.
+Some notable limitations include the lack of proper error handling, and poor modularity when used in conjunction with the actual application code.
+Future releases will contain, hopefully, a much more complete version with improved usability.
+
+
+==============
+COMPILATION
+
+GPUfs requires NVIDIA CUDA 5.0 to be compiled.
+
+1. Environment -- CUDA_ROOT is by default in /usr/local/cuda-5.0, and should be redefined otherwise
+2. Compile the library with 
+> make libgpufs.a
+Debug version can be compiled with:
+make dbg=1 libgpufsd.a
+
+Make sure that you "make clean" before compiling
+
+3. Compile the consistency lib user API in gpufs_con_lib.user directory
+4. Compile any example in the samples directory
+
+
+==============
+USING GPUFS
+
+In order to use gpufs, the best is to look at the examples in the samples directory.
+Every sample has a "fs.cu" file which is the same across all samples, except for 2 lines of code: the one including 
+#include "SAMPLE.CU"
+and the kernel invocation name:
+SAMPLE_KERNEL<<<>>>()
+
+To compile a sample, run:
+> make fs
+and the resulting "fs" binary will be created.
+
+Obviously this is a temporary hack to be used  until a more modularized way of working with GPUfs will be ready for distribution (in the workings now).
+
+The compiled code was checked to be working correctly on both C2075 and K20.
+
+
+==============
+LIMITATIONS
+
+The module that takes care of the buffer cache consistency across multiple GPUs and CPU is not provided because it is by far not ready for the prime time.
+The interface API is required for compilation (gpufs_con_lib.user) but it is not used here.
+
+
+For comments/questions/requests please contact
+Mark Silberstein: marks@cs.utexas.edu
+
+
+

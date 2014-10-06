@@ -8,7 +8,7 @@ GPUnet enables threads or threadblocks in one GPU to communicate with threads in
 GPUnet uses Peer-to-Peer DMA (via GPUDirectRDMA) to place and manage network buffers of a GPU application directly in  GPU memory.  
 
 Code example
-============
+------------
 This is a code example of a simple (working) GPU echo client. 
 
 Note that  the GPU socket API is threadblock-cooperative, meaning that all the threads in the threadblock are required to call the same function with the same parameters at the same point in a program.
@@ -53,3 +53,32 @@ Note that  the GPU socket API is threadblock-cooperative, meaning that all the t
       } END_SINGLE_THREAD_PART;
     }
 
+Prerequisites
+-------------
+ - CUDA 5.5
+ - CUDA driver 331.38 or higher
+ - Mellanox OFED 2.0
+ - Our modules are tested on CentOS 6.5.
+
+ To figure out any issues with configuration, you can run `utils/diagnose.sh`.
+
+Compilation
+-----------
+
+Before compiling, please add your GPU and CUDA compilation option to
+the bottom case statements of `utils/nvcc_option_gen.sh`. Adding an
+entry significantly reduces compilation time.
+
+For compilation of gpunet, `rsocket` for GPUnet needs to be installed
+first. It is located under `core/rsocket`. There, execute the following:
+
+    ./osa_config.sh; make; make install
+
+Then we need the `gpu_usermap` driver. Its location is under `core/gpu_usermap`. Similar `make` and `make install` will do the job.
+
+You can then compile the GPUnet library by running `make` under the `core` directory.
+
+Test application
+-----------------
+
+You can use applications in `apps/microbenchmark` for testing. 
