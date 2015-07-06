@@ -3897,6 +3897,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
             ret = rs_write_data(rs, &sge, 1, xfer_size, IBV_SEND_INLINE);
         } else if (xfer_size <= rs_sbuf_left(rs)) {
             // can send with one ssgl entry
+            int sbuf_left = rs_sbuf_left(rs);
 #ifdef GPUNET
             rs->ssgl[0].addr = (uintptr_t)ringbuf_head(rs->sbuf);
             ringbuf_memcpy_into(rs->sbuf, buf, xfer_size, NULL, 1);
@@ -3905,7 +3906,7 @@ ssize_t rsend(int socket, const void *buf, size_t len, int flags)
 #endif
             rs->ssgl[0].length = xfer_size;
             ret = rs_write_data(rs, rs->ssgl, 1, xfer_size, 0);
-            if (xfer_size < rs_sbuf_left(rs))
+            if (xfer_size < sbuf_left)
                 rs->ssgl[0].addr += xfer_size;
             else
                 rs->ssgl[0].addr = (uintptr_t) rs->sbuf;
