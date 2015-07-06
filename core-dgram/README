@@ -1,0 +1,40 @@
+rsocket-based GPU socket API
+============================
+
+All the relevant pieces are within gpunet.cu for GPU parts, and
+hostloop.cpp for CPU parts. Some lower-level parts are within rsocket
+directory, on infiniband/lib/rsocket directory.
+
+
+
+Connection establishment is mostly done through rsocket accept/connect
+call.
+
+One addition to those two calls is the mapping of GPU system buffer.
+bufs_for_gpu() in hostloop.cpp takes care of allocation of system
+buffer. This function uses get_bufs_gpu() function in the modified
+rsocket library.
+
+
+
+send uses the ringbuffer implementation that uses zero-copy memory for
+the meta data. GPU is the producer, and the CPU is the consumer, and
+the head is updated only by the GPU, the tail only by the CPU.
+
+Two types of requests from GPU to CPU concern the send operations. One
+(SEND_POLL_IPC_REQ) is for checking the availability of local/remote
+buffer, and the other (SEND_IPC_REQ) is for actually firing the send
+request through RQs.
+
+
+
+recv uses different system buffer implementation, that almost adopts
+rsocket buffer implementation to keep the faily complicated flow
+control logic. Similarly to send, the meta data for the buffer is
+mapped on the zero-copy memory. Although CPU and GPU can read all
+those variables, only one type of processor may update a variable.
+
+RECV_POLL_IPC_REQ is the only GPU2CPU request for recv. This checks
+whether there is any recved data. With this data availability
+information, GPU can copy the received data on the system buffer to
+the user buffer.
